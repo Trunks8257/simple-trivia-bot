@@ -1,9 +1,10 @@
 const match = require('../game');
+const { admins } = require('../config.json');
 module.exports = {
 	name: 'stop',
 	aliases: ['end'],
 	execute(client, message) {
-		if (message.author.id !== '461279654158925825') return;
+		if (!admins.includes(message.author.id)) return;
 		const board = match.getBoard();
 		if (!board[0]) return;
 		message.channel.send(

@@ -1,4 +1,5 @@
 const fs = require('fs');
+const config = require('./config.json');
 class game {
 	constructor(questions) {
 		this.questions = questions;
@@ -28,10 +29,10 @@ class game {
 	set_timeout() {
 		this.timeout = setTimeout(() => {
 			this.asked.push(this.id);
-			this.channel.send('tiempo');
+			this.channel.send(config.strings.out_of_time);
 			this.setQuestion();
 			this.channel.send(this.currentQuestion);
-		}, 15000);
+		}, config.time_to_answer);
 	}
 
 	start() {
@@ -60,7 +61,7 @@ class game {
 		this.results = [];
 		setTimeout(() => {
 			clearTimeout(this.timeout);
-		}, 5000);
+		}, config.time_to_answer / 3);
 	}
 
 	getBoard() {

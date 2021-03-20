@@ -1,9 +1,10 @@
 const match = require('../game');
+const { admins } = require('../config.json');
 module.exports = {
 	name: 'start',
 	aliases: ['trivia'],
 	execute(client, message) {
-		if (message.author.id !== '461279654158925825') return;
+		if (!admins.includes(message.author.id)) return;
 		match.start();
 		match.setQuestion(message.channel);
 		match.set_timeout();

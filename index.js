@@ -1,6 +1,7 @@
 /* eslint-disable no-case-declarations */
 const Discord = require('discord.js');
 const client = new Discord.Client({ disableMentions: 'everyone' });
+const config = require('./config.json');
 client.commands = new Discord.Collection();
 
 const fs = require('fs');
@@ -15,43 +16,47 @@ client.on('ready', () => {
 client.on('message', (message) => {
 	if (match.active)
 		if (match.currentAnswers.includes(message.content.toLowerCase()))
-			message.channel.send('correcto').then(() => {
-				if (match.asked.includes(match.id)) return;
-				match.asked.push(match.id);
+			message.channel
+				.send(config.strings.correct.replace('{{user}}', `<@${message.author.id}>`))
+				.then(() => {
+					if (match.asked.includes(match.id)) return;
+					match.asked.push(match.id);
 
-				switch (match.results.some((result) => result.id === message.author.id) > 0) {
-					case true:
-						const user = match.results.find((result) => result.id === message.author.id);
-						user.won++;
-						break;
+					switch (match.results.some((result) => result.id === message.author.id) > 0) {
+						case true:
+							const user = match.results.find(
+								(result) => result.id === message.author.id
+							);
+							user.won++;
+							break;
 
-					case false:
-						match.results.push({
-							id: message.author.id,
-							won: 1
-						});
-						break;
-				}
-				match.setQuestion(message.channel);
-				switch (match.asked.length) {
-					case match.questions.length:
-						const board = match.getBoard();
-						message.channel.send(
-							board.map((u) => `${client.users.cache.get(u.id).tag}: ${u.won}`)
-						);
-						match.end();
-						break;
+						case false:
+							match.results.push({
+								id: message.author.id,
+								won: 1
+							});
+							break;
+					}
+					match.setQuestion(message.channel);
+					switch (match.asked.length) {
+						case match.questions.length:
+							const board = match.getBoard();
+							message.channel.send(
+								board.map((u) => `${client.users.cache.get(u.id).tag}: ${u.won}`)
+							);
+							match.end();
+							break;
 
-					default:
-						setTimeout(() => {
-							message.channel.send(match.currentQuestion);
-							match.set_timeout();
-						}, 3000);
-						break;
-				}
-			});
+						default:
+							setTimeout(() => {
+								message.channel.send(match.currentQuestion);
+								match.set_timeout();
+							}, config.time_between_questions);
+							break;
+					}
+				});
 
-	const prefix = 't/';
+	const prefix = config.prefix;
 	if (!message.content.startsWith(prefix) || message.author.bot) return;
 
 	const args = message.content.slice(prefix.length).split(/ +/);

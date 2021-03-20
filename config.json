@@ -1,0 +1,10 @@
+{
+    "prefix": "t/",
+    "admins": ["461279654158925825", "611710846426415107"],
+    "strings": {
+        "correct": "{{user}}, you got it!",
+        "out_of_time": "You ran out of time :("
+    },
+    "time_to_answer": 15000,
+    "time_between_questions": 3000
+}
