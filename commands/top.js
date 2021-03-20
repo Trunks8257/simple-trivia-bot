@@ -9,7 +9,8 @@ module.exports = {
 			return b.won - a.won;
 		});
 		message.channel.send(
-			data.map((u) => `${client.users.cache.get(u.id).tag}: ${u.won}`)
+			'***LEADERBOARD***\n' +
+				data.map((u) => `${client.users.cache.get(u.id).tag}: ${u.won}`)
 		);
 	}
 };

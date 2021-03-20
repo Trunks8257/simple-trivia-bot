@@ -42,7 +42,8 @@ client.on('message', (message) => {
 						case match.questions.length:
 							const board = match.getBoard();
 							message.channel.send(
-								board.map((u) => `${client.users.cache.get(u.id).tag}: ${u.won}`)
+								'***LEADERBOARD***\n' +
+									board.map((u) => `${client.users.cache.get(u.id).tag}: ${u.won}`)
 							);
 							match.end();
 							break;
