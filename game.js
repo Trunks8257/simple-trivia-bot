@@ -16,7 +16,7 @@ class game {
 		return noAskedQuestions[Math.floor(Math.random() * noAskedQuestions.length)];
 	}
 
-	setQuestion(channel) {
+	setQuestion() {
 		const randomQuestion = this.randomQuestion();
 		if (!randomQuestion) {
 			if (config.lock.lock_channel) {
@@ -38,7 +38,6 @@ class game {
 		this.currentQuestion = randomQuestion.question;
 		this.currentAnswers = randomQuestion.answers;
 		this.id = randomQuestion.id;
-		this.channel = channel;
 		clearTimeout(this.timeout);
 	}
 
@@ -46,7 +45,7 @@ class game {
 		this.timeout = setTimeout(() => {
 			this.asked.push(this.id);
 			this.channel.send(config.strings.out_of_time);
-			this.setQuestion(this.channel);
+			this.setQuestion();
 			if (!this.active) return;
 			this.channel.send(this.currentQuestion);
 			this.set_timeout();

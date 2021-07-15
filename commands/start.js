@@ -7,7 +7,8 @@ module.exports = {
 		if (!admins.includes(message.author.id)) return;
 		if (match.active) return;
 		match.start();
-		match.setQuestion(message.channel);
+		match.channel = message.channel;
+		match.setQuestion();
 		match.set_timeout();
 		message.channel.send(match.currentQuestion);
 	}
