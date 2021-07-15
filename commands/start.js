@@ -5,6 +5,7 @@ module.exports = {
 	aliases: ['trivia'],
 	execute(client, message) {
 		if (!admins.includes(message.author.id)) return;
+		if (match.active) return;
 		match.start();
 		match.setQuestion(message.channel);
 		match.set_timeout();

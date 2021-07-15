@@ -3,7 +3,7 @@ const config = require('./config.json');
 class game {
 	constructor(questions) {
 		this.questions = questions;
-		this.currentQuestion = this.currentAnswers = this.id = this.timeout = this.channel = null;
+		this.currentQuestion = this.currentAnswers = this.id = this.timeout = this.channel = this.client = null;
 		this.active = false;
 		this.asked = [];
 		this.results = [];
@@ -18,7 +18,23 @@ class game {
 
 	setQuestion(channel) {
 		const randomQuestion = this.randomQuestion();
-		if (!randomQuestion) return null;
+		if (!randomQuestion) {
+			if (config.lock.lock_channel) {
+				const role =
+					config.lock.locked_role === 'everyone'
+						? this.channel.guild.roles.everyone
+						: this.channel.guild.roles.cache.get(config.lock.locked_role);
+
+				this.channel.createOverwrite(role, { SEND_MESSAGES: null });
+			}
+			const board = this.getBoard();
+			this.channel.send(
+				'**LEADERBOARD**\n' +
+					// eslint-disable-next-line prettier/prettier
+					board.slice(0, 10).map((u) => `${this.client.users.cache.get(u.id).tag}: ${u.won}`).join('\n')
+			);
+			return this.end();
+		}
 		this.currentQuestion = randomQuestion.question;
 		this.currentAnswers = randomQuestion.answers;
 		this.id = randomQuestion.id;
@@ -30,8 +46,10 @@ class game {
 		this.timeout = setTimeout(() => {
 			this.asked.push(this.id);
 			this.channel.send(config.strings.out_of_time);
-			this.setQuestion();
+			this.setQuestion(this.channel);
+			if (!this.active) return;
 			this.channel.send(this.currentQuestion);
+			this.set_timeout();
 		}, config.time_to_answer);
 	}
 
@@ -42,19 +60,23 @@ class game {
 	end() {
 		this.active = false;
 		this.asked = [];
-		if (!match.results[0]) return;
+		if (!this.results[0]) return;
 		let data = fs.readFileSync('trivia/results.json', 'utf8');
 		data = JSON.parse(data);
 
 		const array = [];
-		for (let index = 0; index < match.results.length; index++) {
-			const newUserData = match.results[index];
+		for (let index = 0; index < this.results.length; index++) {
+			const newUserData = this.results[index];
 			const userData = data.find((u) => u.id === newUserData.id) || {
 				id: newUserData.id,
 				won: 0
 			};
 			array.push({ id: userData.id, won: userData.won + newUserData.won });
 		}
+		const nonParticipated = data.filter((u) => !array.some((user) => user.id === u.id));
+		nonParticipated.forEach((p) => {
+			array.push(p);
+		});
 		fs.writeFileSync('trivia/results.json', JSON.stringify(array), function (err) {
 			if (err) return console.log(err);
 		});
@@ -65,10 +87,10 @@ class game {
 	}
 
 	getBoard() {
-		match.results.sort((a, b) => {
+		this.results.sort((a, b) => {
 			return b.won - a.won;
 		});
-		return match.results;
+		return this.results;
 	}
 }
 const match = new game(require('./trivia/quiz.json'));

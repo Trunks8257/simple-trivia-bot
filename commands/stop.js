@@ -5,10 +5,12 @@ module.exports = {
 	aliases: ['end'],
 	execute(client, message) {
 		if (!admins.includes(message.author.id)) return;
+		if (!match.active) return;
 		const board = match.getBoard();
 		if (!board[0]) return;
 		message.channel.send(
-			board.map((u) => `${client.users.cache.get(u.id).tag}: ${u.won}`)
+			// eslint-disable-next-line prettier/prettier
+			board.slice(0, 10).map((u) => `${client.users.cache.get(u.id).tag}: ${u.won}`).join('\n')
 		);
 		match.end();
 	}

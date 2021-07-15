@@ -6,6 +6,7 @@ client.commands = new Discord.Collection();
 
 const fs = require('fs');
 const match = require('./game');
+match.client = client;
 
 require('dotenv').config();
 
@@ -22,6 +23,14 @@ client.on('message', (message) => {
 					if (match.asked.includes(match.id)) return;
 					match.asked.push(match.id);
 
+					if (config.lock.lock_channel) {
+						const role =
+							config.lock.locked_role === 'everyone'
+								? message.guild.roles.everyone
+								: message.guild.roles.cache.get(config.lock.locked_role);
+
+						message.channel.createOverwrite(role, { SEND_MESSAGES: false });
+					}
 					switch (match.results.some((result) => result.id === message.author.id) > 0) {
 						case true:
 							const user = match.results.find(
@@ -40,16 +49,34 @@ client.on('message', (message) => {
 					match.setQuestion(message.channel);
 					switch (match.asked.length) {
 						case match.questions.length:
+							if (config.lock.lock_channel) {
+								const role =
+									config.lock.locked_role === 'everyone'
+										? message.guild.roles.everyone
+										: message.guild.roles.cache.get(config.lock.locked_role);
+
+								message.channel.createOverwrite(role, { SEND_MESSAGES: null });
+							}
 							const board = match.getBoard();
 							message.channel.send(
-								'***LEADERBOARD***\n' +
-									board.map((u) => `${client.users.cache.get(u.id).tag}: ${u.won}`)
+								'**LEADERBOARD**\n' +
+									// eslint-disable-next-line prettier/prettier
+									board.slice(0, 10).map((u) => `${client.users.cache.get(u.id).tag}: ${u.won}`).join('\n')
 							);
 							match.end();
 							break;
 
 						default:
 							setTimeout(() => {
+								if (config.lock.lock_channel) {
+									const role =
+										config.lock.locked_role === 'everyone'
+											? message.guild.roles.everyone
+											: message.guild.roles.cache.get(config.lock.locked_role);
+
+									message.channel.createOverwrite(role, { SEND_MESSAGES: null });
+								}
+								if (!match.active) return;
 								message.channel.send(match.currentQuestion);
 								match.set_timeout();
 							}, config.time_between_questions);
