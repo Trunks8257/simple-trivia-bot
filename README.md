@@ -1,18 +1,11 @@
 # Discord Trivia Bot
 
-This repo is a Discord.js Trivia Bot.
+This is a Discord Trivia Bot made with Discord.js v12.
 
 ## Installation
 
-First you need to install [Node](https://nodejs.org/). Once installed:
+First you need to install [Node](https://nodejs.org/). Once installed run install.bat and you will be able to start the bot by running start.bat:
 
-```bash
-npm install
-```
-Now you need to create a file named `.env` and copy your token there (Example: TOKEN=WIDEJAWalsdw.12532AASDW), and then:
-```bash
-node index.js
-```
 ## Usage
 
 Add your custom questions into trivia/quiz.json as in the example.

@@ -25,7 +25,7 @@ class game {
 						? this.channel.guild.roles.everyone
 						: this.channel.guild.roles.cache.get(config.lock.locked_role);
 
-				this.channel.createOverwrite(role, { SEND_MESSAGES: null });
+				this.channel.updateOverwrite(role, { SEND_MESSAGES: null });
 			}
 			const board = this.getBoard();
 			this.channel.send(
@@ -44,9 +44,9 @@ class game {
 	set_timeout() {
 		this.timeout = setTimeout(() => {
 			this.asked.push(this.id);
+			if (!this.active) return;
 			this.channel.send(config.strings.out_of_time);
 			this.setQuestion();
-			if (!this.active) return;
 			this.channel.send(this.currentQuestion);
 			this.set_timeout();
 		}, config.time_to_answer);
@@ -80,6 +80,7 @@ class game {
 			if (err) return console.log(err);
 		});
 		this.results = [];
+		this.currentQuestion = this.currentAnswers = this.id = this.timeout = null;
 		setTimeout(() => {
 			clearTimeout(this.timeout);
 		}, config.time_to_answer / 3);

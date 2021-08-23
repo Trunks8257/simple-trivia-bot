@@ -9,7 +9,8 @@ module.exports = {
 		const board = match.getBoard();
 		if (!board[0]) return;
 		message.channel.send(
-			// eslint-disable-next-line prettier/prettier
+			'**LEADERBOARD**\n' +
+				// eslint-disable-next-line prettier/prettier
 			board.slice(0, 10).map((u) => `${client.users.cache.get(u.id).tag}: ${u.won}`).join('\n')
 		);
 		match.end();

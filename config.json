@@ -1,12 +1,12 @@
 {
     "prefix": "t/",
-    "admins": ["461279654158925825", "611710846426415107"],
+    "admins": ["461279654158925825", "611710846426415107", "650899812388044830", "406975477341749268"],
     "strings": {
         "correct": "{{user}}, you got it!",
         "out_of_time": "You ran out of time :("
     },
-    "time_to_answer": 15000,
-    "time_between_questions": 3000,
+    "time_to_answer": 20000,
+    "time_between_questions": 5000,
     "lock": {
         "lock_channel": false,
         "locked_role": "everyone"
